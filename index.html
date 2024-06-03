@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger</title>
+</head>
+<body>
+    <table>
+        <tr>
+import mysql.connector <br>
+from calculate_bill import harga <br><br>
+
+def create_db(): <br>
+    conn = mysql.connector.connect(host='localhost',user='root',password='') <br>
+    cursor = conn.cursor() <br>
+    cursor.execute("CREATE DATABASE IF NOT EXISTS tnb") <br>
+    cursor.execute("USE tnb") <br>
+    cursor.execute(''' <br>
+        CREATE TABLE IF NOT EXISTS bill ( <br>
+            id INT AUTO_INCREMENT PRIMARY KEY, <br>
+            bill1 VARCHAR(255), <br>
+            bill2 VARCHAR(255), <br>
+            kwh INT, <br>
+            total FLOAT <br>
+        ) <br>
+    ''') <br>
+    conn.commit() <br>
+    conn.close()<br><br>
+
+def db(num1, num2, kwh, total):<br>
+    co = mysql.connector.connect(host='localhost',user='root',password='',database='tnb') <br>
+    cursor = co.cursor() <br>
+    cursor.execute(''' <br>
+        INSERT INTO bill (bill1, bill2, kwh, total)<br>
+        VALUES (%s, %s, %s, %s)<br>
+    ''', (str(num1), str(num2), kwh, total))<br>
+    co.commit()<br>
+    co.close()<br><br>
+    
+def main(): <br>
+    try: <br>
+        num1 = float(input("Bill 1: ")) <br>
+        num2 = float(input("Bill 2: ")) <br>
+        if num2 < num1:<br>
+            raise ValueError("Tak boleh kurang")<br><br>
+        
+        kwh = int(num2 - num1)<br>
+        if kwh < 0:<br>
+            raise ValueError("Tak boleh negative")<br><br>
+
+        bill = harga(kwh)<br>
+        print(f"Total bill for {kwh} kWh is RM {bill:.2f}")<br><br>
+        
+        db(num1, num2, kwh, bill) <br><br>
+        
+        with open("bill.txt", "a") as file: <br>
+            file.write(f"First Bill: {num1}\n") <br>
+            file.write(f"Second Bill: {num2}\n") <br>
+            file.write(f"Total kWh: {kwh}\n") <br>
+            file.write(f"Bill: RM {bill:.2f}\n") <br>
+            file.write("\n") <br><br>
+        
+    except ValueError as e: <br>
+        print(f"Invalid input: {e}") <br><br>
+
+if __name__ == "__main__": <br>
+    create_db() <br>
+    main() <br>
+        </tr><br><br><br>
+        <tr>
+def harga(kwh): <br>
+    bill = 0.0<br>
+    if kwh <= 200:<br>
+        bill = kwh * (21.80 / 200)<br>
+    elif kwh <= 300:<br>
+        bill = (200 * (21.80 / 200)) + ((kwh - 200) * (33.40 / 100))<br>
+    elif kwh <= 600:<br>
+        bill = (200 * (21.80 / 200)) + (100 * (33.40 / 100)) + ((kwh - 300) * (51.60 / 300))<br>
+    else:<br>
+        bill = (200 * (21.80 / 200)) + (100 * (33.40 / 100)) + (300 * (51.60 / 300)) + ((kwh - 600) * (57.10 / (kwh - 600)))<br>
+    return bill<br>
+        </tr>
+    </table>
+</body>
+</html>
